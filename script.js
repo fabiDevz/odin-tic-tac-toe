@@ -70,12 +70,20 @@ function controlFlujoDeJuego(nombreJugador1 = 'Jugador 1', nombreJugador2 = 'Jug
   let jugadorActivo = jugadores[0];
   let ganador = '';
   let jugadaGanadora = '';
+  let empate;
+  
 
   const cambiarTurnoJugador = () => {
     jugadorActivo = jugadorActivo === jugadores[0] ? jugadores[1] : jugadores[0];
   };
 
   const getGanador = () => ganador;
+
+  const getEmpate = () => empate;
+
+  const setTrueEmpate = () => {
+    empate = true;
+  }
 
   const obtenerJugadorActivo = () => jugadorActivo;
 
@@ -97,7 +105,7 @@ function controlFlujoDeJuego(nombreJugador1 = 'Jugador 1', nombreJugador2 = 'Jug
   };
 
   const jugarRonda = (fila, columna) => {
-
+    empate = true;
     if (gameOver != true) {
       tablero.marcarJugada(fila, columna, obtenerJugadorActivo().marca);
     } else {
@@ -144,6 +152,27 @@ function controlFlujoDeJuego(nombreJugador1 = 'Jugador 1', nombreJugador2 = 'Jug
       jugadaGanadora = 'd' + 2;
     }
 
+    // COmprobar el empate
+
+    for (let i = 0; i < 3; i++) {
+      for (let j = 0; j < 3; j++) {
+        if (tablero.getTablero()[i][j].getValor() === 0) {
+          
+          empate = false;
+          break;
+        }
+      }
+      if (!empate) {
+        break;
+      }
+    }
+
+    console.log('game over '+gameOver);
+    console.log('empate : '+empate);
+    if (gameOver == false && empate == true) {
+      console.log('Empate');
+      
+    }
     
     cambiarTurnoJugador();
     imprimirNuevaRonda();
@@ -157,6 +186,8 @@ function controlFlujoDeJuego(nombreJugador1 = 'Jugador 1', nombreJugador2 = 'Jug
     obtenerJugadorActivo,
     getGameOver,
     setFalseGameOver,
+    getEmpate,
+    setTrueEmpate,
     reiniciarJuego,
     setNombreJugador,
     getGanador,
@@ -184,6 +215,13 @@ btnCloseModal.addEventListener('click', () => {
 
 function gameOver() {
 
+if(juego.getEmpate())
+{
+  celdas.forEach((celda) => {
+    celda.style.pointerEvents = 'none';
+    tablonInfo.textContent = 'Fin del juego. ¡Ha sido un empate!';
+  });
+}else{
   celdas.forEach((celda) => {
     celda.style.pointerEvents = 'none';
     tablonInfo.textContent = 'Fin del juego !!\n Felicidades ' + juego.getGanador() + ' ganaste';
@@ -259,6 +297,7 @@ function gameOver() {
     default:
       console.log('No se reconoce el patrón de jugada ganadora');
   }
+}
 
 }
 
@@ -274,9 +313,17 @@ function celdaClickeada(event, fila, columna) {
     console.log('jugador activo : ' + juego.obtenerJugadorActivo().marca);
 
   }
+
+  if (juego.getEmpate() && juego.getGameOver() == false) {
+    // Si hay un empate y el juego no ha terminado, mostrar el mensaje de empate
+   
+    gameOver();
+  }
   if (juego.getGameOver()) {
     gameOver();
   }
+
+ 
 
 
 }
